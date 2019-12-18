@@ -54,7 +54,7 @@ class BasicFields(models.Model):
 class CarFields(models.Model):
     brand = models.CharField(_('Brand'), max_length=50)
     model = models.CharField(_('Model'), max_length=50)
-    car_year = models.IntegerField(_('Year of car production'))
+    car_year = models.IntegerField(_('Production Year'))
     color = models.CharField(_('Color'), max_length=30)
 
     class Meta:
