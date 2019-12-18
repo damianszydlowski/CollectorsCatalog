@@ -35,10 +35,15 @@ class CustomUserAdmin(UserAdmin):
 
     get_birth_date.short_description = 'Birth Date'
 
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['id', '__str__']
+
 # class CollectibleAdmin(admin.ModelAdmin):
 #     list_display = ['email', 'username', 'get_birth_date']
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(UserProfile)
-admin.site.register([Field, Category, Collectible])
+admin.site.register(Category, CategoryAdmin)
+admin.site.register([Field, Collectible])

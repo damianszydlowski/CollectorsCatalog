@@ -2,11 +2,14 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django import forms
 from django.views.generic.edit import CreateView, UpdateView
-from .forms import CustomUserCreationForm, UserProfileForm, CustomUserForm
+from .models import Category, Collectible
+from pprint import pprint
+from .forms import CustomUserCreationForm, UserProfileForm, CustomUserForm, CollectibleForm
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -23,6 +26,46 @@ class ProfileUpdate(UpdateView):
 
     def get_object(self):
         return self.request.user.profile
+
+
+def add_collectible(request):
+    category = Category.objects.get(id=2)
+    category_fields = unpack_fields(category)
+    collectible = Collectible()
+    if request.method == 'POST':
+        form = CollectibleForm(request.POST, instance=collectible, category_fields=category_fields)
+        if form.is_valid():
+            collectible = form.save()
+            d = {}
+            for field in category_fields:
+                d[field.slug] = form.cleaned_data[field.slug]
+            Collectible.objects.mongo_update({"id": collectible.id}, {"$set": d})
+            return redirect('collectible_show', collectible_id=collectible.id)
+        collectible_form = CollectibleForm(category_fields=category_fields)
+        return render(request, 'collectible/new.html', {'form': collectible_form})
+
+
+def show_collectible(request, collectible_id):
+    collectible = Collectible.objects.get(id=collectible_id)
+    category = collectible.category
+    category_fields = unpack_fields(category)
+    brand = collectible.brand
+    return render(request, 'collectible/show.html', {'collectible': collectible, 'brand': brand})
+
+
+def unpack_fields(category):
+    category_fields = []
+    if category.parent is None:
+        return category_fields.all()
+    hierarchy = [category]
+    p = category.parent
+    while p is not None:
+        hierarchy.append(p)
+        p = p.parent
+    hierarchy.reverse()
+    for el in hierarchy:
+        category_fields += el.fields.all()
+    return category_fields
 
 
 # @login_required

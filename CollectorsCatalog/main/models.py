@@ -9,6 +9,7 @@ from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 
 # Create your models here.
+from slugify import slugify
 
 
 class CustomUser(AbstractUser):
@@ -35,7 +36,7 @@ class UserProfile(models.Model):
 
 
 class MetaData(models.Model):
-    added_at = models.DateField(default=datetime.now())
+    added_at = models.DateTimeField(default=datetime.now())
     added_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL)
 
     class Meta:
@@ -43,9 +44,9 @@ class MetaData(models.Model):
 
 
 class BasicFields(models.Model):
-    producer = models.CharField(max_length=100, null=True, blank=True)
+    producer = models.CharField(_('Producer'), max_length=100, null=True, blank=True)
     model = models.CharField(_('Model / Product Code'), max_length=300, null=True, blank=True)
-    production_date = models.DateField(null=True, blank=True)
+    production_date = models.DateTimeField(null=True, blank=True)
     photo = models.ImageField(upload_to='collectibles/%Y/%m/%d/', null=True, blank=True)
 
     class Meta:
@@ -63,16 +64,14 @@ class Field(models.Model):
     )
     name = models.CharField(max_length=30)
     type = models.CharField(max_length=1, choices=FIELD_TYPES, default=CHAR)
+    slug = models.CharField(max_length=30, null=True, blank=True)
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.type)
 
-
-class FieldForm(forms.ModelForm):
-
-    class Meta:
-        model = Field
-        fields = ('name', 'type')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.slug = slugify(self.name, separator='_')
 
 
 class Category(models.Model):
@@ -84,6 +83,7 @@ class Category(models.Model):
         blank=True,
         on_delete=models.CASCADE
     )
+    slug = models.CharField(max_length=30, null=True, blank=True)
 
     def __str__(self):
         if self.parent is None:
@@ -101,6 +101,10 @@ class Category(models.Model):
         s = s[:-3]
         return s
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.slug = slugify(self.name, separator='_')
+
 
 class Collectible(models.Model):
     meta_data = models.EmbeddedModelField(
@@ -110,12 +114,10 @@ class Collectible(models.Model):
         model_container=BasicFields
     )
     category = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
-    collectible_specified_fields = models.ArrayReferenceField(
-        to=Field,
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE
-    )
+
+    objects = models.DjongoManager()
 
     def __str__(self):
         return str(self.id)
+
+
