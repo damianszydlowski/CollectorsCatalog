@@ -3,7 +3,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser, UserProfile, Category, RallyRacingCarModel
+from .models import CustomUser, UserProfile, Category, RacingCarModel, RallyRacingCarModel, \
+    F1RacingCarModel
 
 
 # Register your models here.
@@ -35,10 +36,20 @@ class CustomUserAdmin(UserAdmin):
 
     get_birth_date.short_description = 'Birth Date'
 
-# class CollectibleAdmin(admin.ModelAdmin):
-#     list_display = ['email', 'username', 'get_birth_date']
+
+class CollectibleAdmin(admin.ModelAdmin):
+    list_display = ['id', 'get_producer', 'get_product_code']
+
+    def get_producer(self, instance):
+        return instance.basic_fields.producer
+
+    def get_product_code(self, instance):
+        return instance.basic_fields.product_code
+
+    get_producer.short_description = 'Producer'
+    get_product_code.short_description = 'Product Code'
 
 
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(UserProfile)
-admin.site.register([Category, RallyRacingCarModel])
+admin.site.register([UserProfile, Category])
+admin.site.register([RacingCarModel, RallyRacingCarModel, F1RacingCarModel], CollectibleAdmin)
