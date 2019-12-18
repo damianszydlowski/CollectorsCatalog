@@ -11,14 +11,14 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name')
+        fields = ('username', 'email', 'first_name', 'last_name', 'is_moderator')
 
 
 class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name')
+        fields = ('username', 'email', 'first_name', 'last_name', 'is_moderator')
 
 
 class CustomUserForm(forms.ModelForm):
@@ -32,7 +32,7 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ('birthDate', 'avatar', )
+        fields = ('birth_date', 'avatar', )
 
     # def clean_avatar(self):
     #     avatar = self.cleaned_data['avatar']
