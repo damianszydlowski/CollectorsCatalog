@@ -1,13 +1,17 @@
 # main/models.py
 
-from django.contrib.auth.models import AbstractUser
+from datetime import datetime
 from djongo import models
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-from datetime import datetime
+from model_utils.managers import InheritanceManager
+from . import model_fields
 
-# Create your models here.
+
+# Create your models here
 
 
 class CustomUser(AbstractUser):
@@ -59,93 +63,67 @@ class Category(models.Model):
 
 class MetaData(models.Model):
     added_at = models.DateField(default=datetime.now())
-    added_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL)
+    is_accepted = models.BooleanField(_('Is accepted'), default=False)
 
     class Meta:
         abstract = True
-
-
-class BasicFields(models.Model):
-    producer = models.CharField(max_length=100, null=True, blank=True)
-    product_code = models.CharField(_('Product Code / Model Number'), max_length=300, null=True, blank=True)
-    production_date = models.DateField(null=True, blank=True)
-    photo = models.ImageField(upload_to='collectibles/%Y/%m/%d/', null=True, blank=True)
-
-    class Meta:
-        abstract = True
-
-
-# *********** Car specific fields start
-class CarFields(models.Model):
-    brand = models.CharField(_('Brand'), max_length=50)
-    model = models.CharField(_('Model'), max_length=50)
-    car_year = models.IntegerField(_('Production Year'))
-    color = models.CharField(_('Color'), max_length=30)
-    scale = models.IntegerField(_('Scale 1:'))
-
-    class Meta:
-        abstract = True
-
-
-class RacingCarFields(models.Model):
-    livery = models.CharField(_('Livery'), max_length=30)
-    driver = models.CharField(_('Driver'), max_length=60)
-    event = models.CharField(_('Event Name'), max_length=100)
-    event_year = models.IntegerField(_('Event Year'))
-    car_number = models.IntegerField(_('Car start number'))
-    position = models.IntegerField(_('Position'), null=True, blank=True)
-    series = models.CharField(_('Series'), max_length=60)
-
-    class Meta:
-        abstract = True
-
-
-class RallyRacingCarFields(models.Model):
-    co_driver = models.CharField(_('Co-driver'), max_length=60, null=True, blank=True)
-
-
-class F1RacingCarFields(models.Model):
-    engine_supplier = models.CharField(_('Engine Supplier'), max_length=60)
-    tire_supplier = models.CharField(_('Tires Supplier'), max_length=60)
-# *********** Car specific fields end
 
 
 class Collectible(models.Model):
-    meta_data = models.EmbeddedModelField(
+    objects = InheritanceManager()
+    added_by = models.ForeignKey(get_user_model(), null=True, on_delete=models.SET_NULL)
+    meta_data = models.EmbeddedField(
         model_container=MetaData
     )
-    basic_fields = models.EmbeddedModelField(
-        model_container=BasicFields
+    photo = models.ImageField(upload_to='collectibles/%Y/%m/%d/', null=True, blank=True)
+    collectible = models.EmbeddedField(
+        model_container=model_fields.BasicFields
     )
     category = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         # return str(self.id)
-        s = self.basic_fields.producer
-        if self.basic_fields.product_code is not None:
-            s += ' ' + self.basic_fields.product_code
+        s = self.collectible.producer
+        if self.collectible.product_code is not None:
+            s += ' ' + self.collectible.product_code
         else:
-            s += ' ' + self.id
+            s += ' ' + str(self.id)
         return s
+
+    class Meta:
+        abstract = True
 
 
 class CarModel(Collectible):
-    car_fields = models.EmbeddedModelField(model_container=CarFields)
+    car = models.EmbeddedField(model_container=model_fields.CarFields)
 
     class Meta:
         abstract = True
 
 
 class RacingCarModel(CarModel):
-    racing_fields = models.EmbeddedModelField(model_container=RacingCarFields)
+    race = models.EmbeddedField(model_container=model_fields.RacingCarFields)
     objects = models.DjongoManager()
 
 
 class RallyRacingCarModel(RacingCarModel):
-    rally_fields = models.EmbeddedModelField(model_container=RallyRacingCarFields)
+    rally = models.EmbeddedField(model_container=model_fields.RallyRacingCarFields)
     objects = models.DjongoManager()
 
 
 class F1RacingCarModel(RacingCarModel):
-    f1_fields = models.EmbeddedModelField(model_container=F1RacingCarFields)
+    f1 = models.EmbeddedField(model_container=model_fields.F1RacingCarFields)
     objects = models.DjongoManager()
+
+
+class Book(Collectible):
+    book = models.EmbeddedField(model_container=model_fields.BookFields)
+    objects = models.DjongoManager()
+
+
+class Watch(Collectible):
+    watch = models.EmbeddedField(model_container=model_fields.WatchFields)
+    objects = models.DjongoManager()
+
+    class Meta:
+        verbose_name_plural = 'Watches'

@@ -1,15 +1,24 @@
 <!-- templates/home.html -->
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
+{% load static %}
 
 {% block title %}Home{% endblock %}
 
 {% block content %}
-{% if user.is_authenticated %}
-  Hi {{ user.username }}!
-  <p><a href="{% url 'logout' %}">logout</a></p>
-{% else %}
-  <p>You are not logged in</p>
-  <a href="{% url 'login' %}">login</a> |
-  <a href="{% url 'signup' %}">signup</a>
-{% endif %}
+    <h3>Cars</h3>
+    <ul>
+    {% for collectible in collectibles %}
+        <li>{{ collectible.basic_fields.producer }} <img style="max-height:100px" src="{{ collectible.photo.url }}" /></li>
+    {% endfor %}
+    </ul>
+
+
+    {% if user.is_authenticated %}
+        Hi {{ user.username }}!
+        <p><a href="{% url 'logout' %}">logout</a></p>
+    {% else %}
+        <p>You are not logged in</p>
+        <a href="{% url 'login' %}">login</a> |
+        <a href="{% url 'signup' %}">signup</a>
+    {% endif %}
 {% endblock %}

@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from .models import CustomUser, UserProfile, Category, RacingCarModel, RallyRacingCarModel, \
-    F1RacingCarModel
+    F1RacingCarModel, Book, Watch, Collectible
 
 
 # Register your models here.
@@ -41,10 +41,10 @@ class CollectibleAdmin(admin.ModelAdmin):
     list_display = ['id', 'get_producer', 'get_product_code']
 
     def get_producer(self, instance):
-        return instance.basic_fields.producer
+        return instance.collectible.producer
 
     def get_product_code(self, instance):
-        return instance.basic_fields.product_code
+        return instance.collectible.product_code
 
     get_producer.short_description = 'Producer'
     get_product_code.short_description = 'Product Code'
@@ -52,4 +52,4 @@ class CollectibleAdmin(admin.ModelAdmin):
 
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register([UserProfile, Category])
-admin.site.register([RacingCarModel, RallyRacingCarModel, F1RacingCarModel], CollectibleAdmin)
+admin.site.register([RacingCarModel, RallyRacingCarModel, F1RacingCarModel, Book, Watch], CollectibleAdmin)

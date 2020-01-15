@@ -1,11 +1,16 @@
 # main/views.py
+from urllib.request import Request
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django import forms
+from django.views.decorators.http import require_http_methods
 from django.views.generic.edit import CreateView, UpdateView
+
+from .models import Collectible, RallyRacingCarModel
 from .forms import CustomUserCreationForm, UserProfileForm, CustomUserForm
 from django.utils.translation import ugettext_lazy as _
 
@@ -24,6 +29,14 @@ class ProfileUpdate(UpdateView):
     def get_object(self):
         return self.request.user.profile
 
+
+@require_http_methods(["GET", "POST"])
+def home_page(request):
+    # entries = Entry.objects.filter(blog={'name': 'Beatles Blog'})
+    collectibles = RallyRacingCarModel.objects.filter(collectible={'producer': 'Minichamps'})
+    # producers = RallyRacingCarModel.objects.basic_fields('producer')
+    context = {'collectibles': collectibles}
+    return render(request, 'home.html', context)
 
 # @login_required
 # @transaction.atomic
