@@ -1,0 +1,32 @@
+<!-- templates/home.html -->
+{% extends 'layout.html' %}
+
+{% block title %}Panel administratora{% endblock %}
+
+{% block content %}
+    <h2>Te przedmioty wymagają zaakceptowania</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Nazwa</th>
+            <th>Data dodania</th>
+            <th>Użytkownik</th>
+            <th>Akcje</th>
+
+        </tr>
+        {% for collectible in collectibles %}
+            <tr>
+                <td>{{ collectible.id }}</td>
+                <td>{{ collectible.name }}</td>
+                <td>{{ collectible.added_at }}</td>
+                <td>{{ collectible.added_by }}</td>
+                <td>
+                    <ul>
+                        <li><a href="{% url 'moderator_panel_approve' collectible.id %}">Zaakceptuj</a></li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

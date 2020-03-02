@@ -1,0 +1,54 @@
+<!-- templates/home.html -->
+{% extends 'layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Wyniki wyszukiwania{% endblock %}
+
+{% block content %}
+
+    {% include 'layout/breadcrumbs.html' with category=category %}
+
+    {% if category %}
+        {% include 'layout/subcategories.html' with category=category %}
+    {% endif %}
+
+    <hr/>
+
+    <h3>Wyniki wyszukiwania {% if category %}w kategorii {{ category.name }}{% endif %} dla hasła:
+        <strong>{{ request.GET.q }}</strong>.
+
+        {% if category %}
+            <small><a href="{% url 'collectible_search' %}?q={{ request.GET.q }}">
+                Wyszukaj we wszystkich kategoriach</a></small>
+        {% endif %}</h3>
+
+    <h4>Znalezione kategorie:</h4>
+    {% if found_categories|length > 0 %}
+
+        {% for category in found_categories %}
+            <a class="uk-label" href="{% url 'category_show' category.get_slug_list|last %}">{{ category.name }}</a>
+        {% endfor %}
+    {% else %}
+        <h5>Nie znaleziono pasujących kategorii.</h5>
+    {% endif %}
+
+    <h4>Znalezione przedmioty: </h4>
+    {% if found_collectibles|length > 0 %}
+        {% include 'layout/collectible-list.html' with collectibles=found_collectibles %}
+    {% else %}
+        <h5>Nie znaleziono pasujących przedmiotów kolekcjonerskich.</h5>
+    {% endif %}
+
+    <h4>Znalezione profile: </h4>
+    {% if found_profiles|length > 0 %}
+        <ul class="uk-list-divider">
+        <h5>Znalezieni użytkownicy: </h5>
+            {% for profile in found_profiles %}
+                <li><a href="{% url 'profile_show' profile.pk %}">{{ profile.username }}: {{ profile.first_name }} {{ profile.last_name }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <h5>Nie znaleziono pasujących profili użytkowników.</h5>
+    {% endif %}
+{% endblock %}

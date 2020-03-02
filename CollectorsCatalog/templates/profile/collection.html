@@ -1,0 +1,13 @@
+<!-- templates/home.html -->
+{% extends 'layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Twoja kolekcja{% endblock %}
+
+{% block content %}
+
+    <h4>Oto twoja kolekcja:</h4>
+
+    {% include 'layout/collectible-list.html' with collectibles=collectibles is_user_page=is_user_page %}
+{% endblock %}

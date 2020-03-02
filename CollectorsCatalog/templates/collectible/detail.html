@@ -1,0 +1,10 @@
+<!-- templates/collectible/detail.html -->
+{% extends 'layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ object.name }}{% endblock %}
+
+{% block content %}
+    {% include 'layout/collectible-detail.html' with collectible=object %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{% load namify %}
+<ul class="uk-breadcrumb">
+    <li><a href="/">Home</a></li>
+    {% for i in category.get_slug_list %}
+        <li><a href="{% url 'category_show' i %}">{{ i | get_name }}</a></li>
+    {% endfor %}
+        {% if extra %}
+            <li><a href="">{{ extra }}</a></li>
+        {% endif %}
+</ul>

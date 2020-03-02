@@ -1,0 +1,66 @@
+<!-- templates/home.html -->
+{% extends 'layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Konto użytkownika @{{ object.username }}{% endblock %}
+
+{% block content %}
+    <h3>Profil użytkownika @{{ object.username }}</h3>
+
+    <div uk-grid>
+        <div class="uk-width-1-4@l uk-width-1-3@m uk-width-1-2@s uk-section-small nature-card">
+            <div class="uk-card uk-card-body uk-card-default user-card uk-text-small">
+                <div class="uk-text-center uk-margin-medium-bottom">
+                    <span class="uk-label moderator-label">Moderator</span>
+                </div>
+                <img class="lazy uk-border-circle uk-box-shadow-medium uk-box-shadow-hover-large" data-src="
+                                    {% if object.profile.avatar %}
+                                        {{ object.profile.avatar.url }}
+                                    {% else %}
+                                        https://pwik.krzanowice.pl/uploads/default-image.png
+                                    {% endif %}
+                                    " data-width="400" data-height="300" data-uk-img alt=""
+                    src="https://pwik.krzanowice.pl/uploads/default-image.png"></a>
+                {% if object.is_moderator %}
+                {% endif %}
+                <h4 class="uk-text-center"><strong>{{ object.first_name }} {{ object.last_name }}</strong></h4>
+                <p class="uk-margin-small-bottom">Członek od: {{ object.date_joined }}</p>
+                {% if object.profile.is_moderator %}
+                <p class="uk-margin-small-bottom uk-margin-small-top">
+                    Posiada <strong>{{ object.collection.count }}</strong> przedmiotów w swojej kolekcji</p>
+                <p class="uk-margin-small-bottom uk-margin-small-top">
+                    Obserwowany przez <strong>{{ object.profile.watchers.count }}</strong> osób</p>
+                {% endif %}
+                <p class="uk-margin-small-bottom uk-margin-small-top">
+                    Dodał <strong>{{ object.added.count }}</strong> przedmiotów do bazy</p>
+
+                {% if object.profile in user.profile.observed.all %}
+                    <p>Już obserwujesz</p>
+                {% else %}
+                    <button class="uk-align-center uk-button uk-button-default uk-border-pill uk-margin-remove-bottom js-watch-user" data-action-url="{% url 'ajax_watch_user' %}"
+                       style="background-color: white" data-target-user-id="{{ object.id }}" data-csrf="{{ csrf_token }}"
+                            {% if not object.profile.is_public %}
+                                disabled uk-tooltip="title: Profil użytkownika jest prywatny, więc nie możesz go obserwować"
+                            {% endif %}
+                    ><span data-uk-icon="icon: plus"></span> Obserwuj</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="uk-width-expand">
+            {% if object.profile.is_public %}
+                {% include 'layout/collectible-list.html' with collectibles=object.collection.all is_side=True %}
+            {% else %}
+                <div class="uk-section uk-section-small">
+                    <p>Ten użytkownik ustalił swoją kolekcję jako prywatną</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ block.super }}
+    <script src="{% static 'js/ajaxWatchUser.js' %}"></script>
+{% endblock %}

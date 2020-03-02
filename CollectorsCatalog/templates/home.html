@@ -1,24 +1,23 @@
 <!-- templates/home.html -->
 {% extends 'layout.html' %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Strona główna - katalog kolekcjonera{% endblock %}
 
 {% block content %}
-    <h3>Cars</h3>
-    <ul>
-    {% for collectible in collectibles %}
-        <li>{{ collectible.basic_fields.producer }} <img style="max-height:100px" src="{{ collectible.photo.url }}" /></li>
-    {% endfor %}
+    <h6 class="uk-text-uppercase">Najpopularniejsze kategorie:</h6>
+        <ul class="uk-list uk-list-divider">
+        {% for category in categories %}
+            <li class=".uk-text-small uk-margin-small-right"><a
+                   href="{% url 'category_show' category.get_slug_list|last %}">{{ category.get_breadcrumb }}</a> <span class="uk-badge">{{ category.collectibles.count }}</span></li>
+        {% endfor %}
+        <li class=".uk-text-small"><a href="{% url 'category_index' %}">Zobacz wszystkie</a></li>
     </ul>
 
+    <h3>Ostatnio dodane</h3>
+    {% include 'layout/collectible-list.html' with collectibles=recent_collectibles %}
 
-    {% if user.is_authenticated %}
-        Hi {{ user.username }}!
-        <p><a href="{% url 'logout' %}">logout</a></p>
-    {% else %}
-        <p>You are not logged in</p>
-        <a href="{% url 'login' %}">login</a> |
-        <a href="{% url 'signup' %}">signup</a>
-    {% endif %}
+    <h3>Posiadane przez najwięcej użytkowników</h3>
+    {% include 'layout/collectible-list.html' with collectibles=popular_collectibles %}
 {% endblock %}

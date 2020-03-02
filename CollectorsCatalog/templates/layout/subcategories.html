@@ -1,0 +1,9 @@
+{% if category.children.all %}
+    <ul class="uk-subnav uk-subnav-pill">
+        <li class="uk-active"><a class="uk-label" style="cursor:default">Podkategorie:</a></li>
+        {% for children in category.children.all %}
+            <li><a class="uk-label"
+                   href="{% url 'category_show' children.get_slug_list|last %}"> {{ children.name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endif %}

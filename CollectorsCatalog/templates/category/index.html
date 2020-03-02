@@ -1,0 +1,23 @@
+<!-- templates/category/index.html -->
+{% extends 'layout.html' %}
+
+{% load namify %}
+{% block title %}
+    Kategorie
+{% endblock %}
+
+{% block content %}
+    {% load mptt_tags %}
+    <ul class="uk-list uk-list-large">
+        {% recursetree categories %}
+            <li>
+                <a href="{% url 'category_show' node.get_slug_list|last %}">{{ node.name }}</a>
+                {% if not node.is_leaf_node %}
+                    <ul class="uk-list">
+                        {{ children }}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endrecursetree %}
+    </ul>
+{% endblock %}

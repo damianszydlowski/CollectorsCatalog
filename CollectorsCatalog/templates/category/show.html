@@ -1,0 +1,27 @@
+<!-- templates/home.html -->
+{% extends 'layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ category.name }}{% endblock %}
+
+{% block content %}
+
+    {% include 'layout/breadcrumbs.html' with category=category %}
+
+    {% if category %}
+        {% include 'layout/subcategories.html' with category=category %}
+    {% endif %}
+
+    <div>
+        <h3>Przedmioty kolekcjonerskie z kategorii <strong>{{ category.name }}</strong>
+        {% if category.is_leaf_node %}
+            <a href="{% url 'collectible_add' category.slug %}"
+           class="uk-button uk-button-primary uk-align-right uk-margin-remove-adjacent">
+                <span data-uk-icon="icon:plus; ratio: 0.8"></span> Dodaj w tej kategorii
+            </a>
+        {% endif %}
+        </h3>
+    </div>
+    {% include 'layout/collectible-list.html' with collectibles=collectibles %}
+{% endblock %}

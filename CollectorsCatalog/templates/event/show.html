@@ -1,0 +1,19 @@
+<!-- templates/home.html -->
+{% extends 'layout.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ event.name }}{% endblock %}
+
+{% block content %}
+    <ul class="uk-breadcrumb">
+        <li><a href="/">Strona główna</a></li>
+        <li>Wydarzenia</li>
+        <li>{{ event.get_type_display }}</li>
+        <li><strong>{{ event.name }}</strong> {{ event.year }} ({{ event.country }})</li>
+    </ul>
+
+    <h3>Przedmioty kolekcjonerskie z wydarzenia <strong>{{ event.name }}</strong> {{ event.year }} ({{ event.country }})
+    </h3>
+    {% include 'layout/collectible-list.html' with collectibles=collectibles %}
+{% endblock %}

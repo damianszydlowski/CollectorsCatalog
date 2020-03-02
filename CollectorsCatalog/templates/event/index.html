@@ -1,0 +1,28 @@
+<!-- templates/category/index.html -->
+{% extends 'layout.html' %}
+
+{% block title %}
+    Wydarzenia
+{% endblock %}
+
+{% block content %}
+    <h3>Wydarzenia: </h3>
+    <div class="uk-grid uk-grid-medium uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l  uk-child-width-1-5@xl uk-grid-match js-filter" data-uk-grid="masonry: true">
+        {% for event in events %}
+            <div>
+                <div class="uk-card uk-card-default uk-card-body nature-card">
+                    <div><small class="uk-text-muted">Rodzaj</small><br/>
+                        {{ event.get_type_display }}</div>
+                    <div><small class="uk-text-muted">Nazwa</small><br/>
+                        {{ event.name }}</div>
+                    <div><small class="uk-text-muted">Rok</small><br/>
+                        {{ event.year }}</div>
+                    <div><small class="uk-text-muted">Kraj</small><br/>
+                        {{ event.country }}</div>
+                    <hr/>
+                    <a href="{% url 'event_show' event.slug %}">Przedmioty z wydarzenia</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
